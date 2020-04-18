@@ -1,1 +1,1 @@
-'web: gunicorn gcepac.wsgi --log-file -' 
+web: gunicorn gcepac.wsgi --log-file -
