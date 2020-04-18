@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    textarea {
+        height: 30px;
+        resize: none;
+        border: none;
+        background-color: rgba(255, 255, 255, 0);
+    }
+
+    textarea:focus {
+        outline: none;
+    }
+
+    button {
+        background-color: rgba(255, 255, 255, 0);
+        border: rgba(255, 255, 255);
+    }
+
+    .send-area {
+        border-radius: 30px;
+        height: 50px;
+    }
+
+    footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        padding: 10px;
+        background-color: white;
+    }
+</style>
+<style>
+    .l-balloon {
+        background-color: #007bff;
+        color: white;
+        border-radius: 30px;
+        border-bottom-left-radius: 0px;
+        padding: 10px
+    }
+
+    .r-balloon {
+        background-color: #dddddd;
+        color: rgb(87, 87, 87);
+        border-radius: 30px;
+        border-bottom-right-radius: 0px;
+        padding: 10px
+    }
+
+    p {
+        margin-bottom: 0px;
+    }
+</style>
+<div class="p-md-3 mt-3">
+    {% for text in class.texts.all %}
+    {% if text.user != request.user %}
+    <div class="row m-0">
+        <div class="col-md-4 w-75 mb-2">
+            <div class="card l-balloon border p-3" style="padding-bottom: -10px;">
+                {{text.messages|linebreaks}}
+            </div>
+            <span style="font-size: x-small; padding: 5px;">{{text.time}}</span>
+            <br>
+        </div>
+    </div>
+    {% else %}
+    <div class="row m-0 text-right">
+        <div class="col-md-4 w-75 mb-2 mr-0 ml-auto float-right">
+            <div class="card r-balloon border p-3" style="padding-bottom: -10px;">
+                {{text.messages|linebreaks}}
+            </div>
+            <span class="float-right" style="font-size: x-small; padding: 5px;">{{text.time}}</span>
+            <br>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+<br><br>
+<footer>
+    <div style="font-size: large;" class="send-area border">
+        <form action="{% url 'messages' pk=class.id %}" method="POST" id="new_message_form" class="row m-1">
+            {% csrf_token %}
+            <textarea name="message" rows="1" class="col" style="margin: 5px 10px"
+                placeholder="Type a message..."></textarea>
+            <button type="submit" class="d-block mr-3 ml-auto col-1 p-0 mt-1"><i class="fas fa-paper-plane text-primary"
+                    style="font-size: 20px;"></i></button>
+
+        </form>
+    </div>
+</footer>
+
+{% endblock content %}
