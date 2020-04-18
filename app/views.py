@@ -24,7 +24,7 @@ def messages(request, pk):
     if request.method == "POST":
         message = Messages()
         message.user = User.objects.get(id=request.user.id)
-        message.id = get_random_string(128).lower()
+        message.id = get_random_string(8).lower()
         msg = request.POST.get('message')
         if msg.replace(' ','').strip() != '':
             obj = Class.objects.get(id=pk)
