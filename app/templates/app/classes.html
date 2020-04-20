@@ -2,11 +2,32 @@
 
 {% block content %}
 
+<style>
+    .a {
+        display: inline;
+    }
+</style>
 
 <div class="container p-3 p-md-5 mt-3">
-    <h5 class="display-4" style="font-size: 26px;">Classes you have joined:</h5>
+    <h5 class="display-4 d-none d-block" style="font-size: 26px;">Your classes:
+        <a class="text-muted font-small d-none d-md-inline float-right mt-2 mt-md-3" data-toggle="modal"
+            data-target="#exampleModalCenter"> Invite Notifications</a><i
+            class="far fa-bell font-small float-right mt-2 mt-md-3 mr-md-2" data-toggle="modal"
+            data-target="#exampleModalCenter"></i>
+        <a class="text-muted font-small float-right mt-2 mt-md-3 mx-2">|</a>
+        <a href="{% url 'new-classroom' %}"
+            class="font-small text-muted d-none d-md-inline float-right mt-md-3">Classroom</a><a
+            class="fas fa-plus font-small text-dark float-right mt-2 mt-md-3 mx-md-2"
+            href="{% url 'new-classroom' %}"></a>
+    </h5>
     <hr>
+    {% for message in messages %}
+    <div class="alert alert-success">
+        <a>{{message}}</a>
+    </div>
+    {% endfor %}
     <div class="row m-0">
+        {% if classes %}
         {% for class in classes %}
         <div class="col-md-4 mb-3">
             <div class="card card-1">
@@ -15,11 +36,47 @@
                     <br>
                     <a>Creator: {{class.creator}}</a>
                     <br>
-                    <a href="{% url 'messages' pk=class.id %}">Enter Classroom</a>
+                    <a href="{% url 'classroom' pk=class.id %}">Enter Classroom</a>
                 </div>
             </div>
         </div>
         {% endfor %}
+        {% else %}
+        <p class="text-muted">You haven't joined any classes so far.</p>
+        {% endif %}
+    </div>
+</div>
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Invite notifications</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% if not invites %}
+                <p>You have no pending requests.</p>
+                {% else %}
+                <div class="card shadow-none border">
+                    {% for invite in invites reversed %}
+                    <div class="border-bottom px-3 py-2">
+                        {% if invite.invalid == False %}
+                        {{invite.clss.id}} - {{invite.clss.name|truncatechars:20}}
+                        <a class="text-success float-right"
+                            href="{% url 'add-member' pk=invite.code to=request.user.profile.id %}"><i
+                                class="fa fa-check mr-2"></i>Accept</a>
+                        {% else %}
+                        <i class="text-muted font-small">Link expired...</i>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 

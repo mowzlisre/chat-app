@@ -52,7 +52,15 @@
         margin-bottom: 0px;
     }
 </style>
-<div class="p-md-3 mt-3">
+
+<script>
+$(document).ready(function(){
+    setInterval(function(){
+         $('#messages').load("{% url 'messages' class.id %}");
+         }, 100);
+    }); 
+ </script>
+<div id="messages" class="p-md-3 mt-3">
     {% for text in class.texts.all %}
     {% if text.user != request.user %}
     <div class="row m-0">
@@ -83,7 +91,8 @@
         <form action="{% url 'messages' pk=class.id %}" method="POST" id="new_message_form" class="row m-1">
             {% csrf_token %}
             <textarea name="message" rows="1" class="col" style="margin: 5px 10px"
-                placeholder="Type a message..."></textarea>
+                {% if class.texting == 'ADMINs ONLY' %} {% if request.user not in class.admin.all %} disabled  placeholder="Only admins can send messages..."
+                {% else %} placeholder="Type a message..." {% endif %} {% endif %}></textarea>
             <button type="submit" class="d-block mr-3 ml-auto col-1 p-0 mt-1"><i class="fas fa-paper-plane text-primary"
                     style="font-size: 20px;"></i></button>
 

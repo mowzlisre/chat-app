@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    a {
+        color: black;
+    }
+
+    a:hover {
+        color: black;
+    }
+</style>
+<div class="card p-md-5 m-3 p-4 m-md-5">
+    <div>
+        <h1 class="display-3 d-none d-md-block">{{class.name}}</h1>
+        <h1 class="d-md-none">{{class.name}}</h1>
+        {% if class.description %}
+        <div class="px-1">
+            <b class="font-medium">Class description</b>
+            <p class="font-small text-muted">{{class.description}}</p>
+        </div>
+        {% endif %}
+        {% for message in messages %}
+          <div class="alert alert-primary">
+              {{message}}
+          </div>
+        {% endfor %}
+    </div>
+    <hr class="m-0">
+    <div class="p-1">
+        <a href="" class="mr-2 text-secondary"><i class="far fa-user mr-1"></i><b
+                class="mr-1">{{class.members.count}}</b>Members</a>
+        {% if class.privacy == 'OPEN' %}
+        <a href="" class="mr-2 text-success"><i class="fas fa-toggle-on mr-1"></i>{{class.privacy}}</a>
+        {% elif class.privacy == 'INVITE ONLY' %}
+        <a href="" class="mr-2 text-warning"><i class="fas fa-toggle-on mr-1"></i>{{class.privacy}}</a>
+        {% elif class.privacy == 'CLOSED' %}
+        <a href="" class="mr-2 text-danger"><i class="fas fa-toggle-off mr-1"></i>{{class.privacy}}</a>
+        {% endif %}
+        {% if class.texting == 'ALL' %}
+        <a href="" class="mr-2 text-success"><i class="fas fa-envelope mr-1"></i>{{class.texting}}</a>
+        {% elif class.texting == 'ADMINS ONLY' %}
+        <a href="" class="mr-2 text-warning"><i class="fas fa-envelope mr-1"></i>{{class.texting}}</a>
+        {% endif %}
+        <a href="" class="mr-2 text-info"><i class="far fa-clock mr-1"></i>{{class.date_created|date:"dS M, Y"}}</a>
+        {% if class.creator == request.user %}
+        <a href="{% url 'classroom-settings' pk=class.id %}" class="mr-2 text-muted"><i
+                class="fa fa-cog mr-1"></i>Settings</a>
+        {% else %}
+        <a href="{% url 'leave-class' pk=class.id code=request.user.profile.id %}" class="mr-2 text-danger"><i class="fas fa-sign-out-alt mr-1"></i>Leave group</a>
+        {% endif %}
+    </div>
+    <hr class="m-0">
+    <div class="row p-md-3">
+        <a class="card col-md-3 card-2 my-2 mx-md-2">
+            <div class="p-md-4 py-3 px-4 text-center mr-md-3">
+                <i class="far fa-folder-open mr-2 text-warning" style="font-size: 60px;"></i>
+                <h1>Resources</h1>
+            </div>
+        </a>
+        <a class="card col-md-3 card-3 my-2 mx-md-2" href="{% url 'messages' class.id %}">
+            <div class="p-md-4 py-3 px-4 text-center mr-md-3">
+                <i class="far fa-comments mr-2 text-info" style="font-size: 60px"></i>
+                <h1 style="text-decoration: none;">Chat Room</h1>
+            </div>
+        </a>
+        <a class="card col-md-3 card-1 my-2 mx-md-2" href="">
+            <div class="p-md-4 py-3 px-4 text-center mr-md-3">
+                <i class="far fa-copy mr-2 text-primary" style="font-size: 60px;"></i>
+                <h1 style="text-decoration: none;">Schedules</h1>
+            </div>
+        </a>
+    </div>
+</div>
+
+{% endblock content %}

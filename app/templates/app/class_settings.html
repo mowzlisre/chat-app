@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    input[type="text"],
+    textarea,
+    select {
+        border: none;
+        border-bottom: 1px solid rgb(56, 56, 56);
+        width: 100%;
+        outline: none;
+    }
+
+    input:disabled {
+        background-color: rgba(255, 255, 255, 0);
+        color: grey
+    }
+
+    input:disabled::selection {
+        background-color: rgba(255, 255, 255, 0);
+    }
+
+    a {
+        color: black
+    }
+</style>
+{% if request.user in obj.admin.all %}
+<div class="container-md py-5">
+    <div class="col-md-6 card mx-auto p-5 px-4">
+        <h1><a href="{% url 'classroom' pk=obj.id %}" class="fa fa-angle-left text-muted wave-effect"></a><i
+                class="fa fa-cog mr-3 text-muted float-right mt-1 ml-3"></i><a class="float-right">Settings</a></h1>
+        <hr class="m-0"><br>
+        {% for message in messages %}
+        {% if message.tags == 'success' %}
+        <div class="alert alert-success">
+            <a>{{message}}</a>
+        </div>
+        {% endif %}
+        {% if message.tags == 'error' %}
+        <div class="alert alert-danger">
+            <a>{{message}}</a>
+        </div>
+        {% endif %}
+        {% if message.tags == 'warning' %}
+        <div class="alert alert-warning">
+            <a>{{message}}</a>
+        </div>          
+        {% endif %}
+        {% endfor %}
+        <form action="" method="post">
+            {% csrf_token %}
+            <label>Classroom code</a></label>
+            <input type="text" value="{{obj.id}}" disabled>
+            <label class="mt-3">Classroom name</label>
+            <input type="text" name="name" autocomplete="off" value="{{obj.name}}">
+            <label class="mt-3">Description</label>
+            <textarea name="description" rows="1">{{obj.description}}</textarea>
+            <label class="mt-3">Created by</label>
+            <input type="text" value="{{obj.creator}}" disabled>
+            <label class="mt-3">Admins</label>
+            <div class="card shadow-none border">
+                {% for admin in obj.admin.all %}
+                <a href="{% url 'remove-admin' pk=obj.id code=admin.profile.id %}"
+                    class="border-bottom p-2 px-3">{{admin}}<i class="fa fa-minus text-danger float-right mt-1"></i>
+                </a>
+                {% endfor %}
+                <a class="p-2 px-3" data-toggle="modal" data-target="#exampleModalCenter"><i
+                        class="fa fa-plus text-success mr-2"></i>Add new admin</a>
+            </div>
+            <label class="mt-3">Members</label>
+            <div class="card shadow-none border">
+                {% for member in obj.members.all %}
+                <div class="border-bottom p-2 px-3">{{member}}<a class="fa fa-minus text-danger float-right mt-1"
+                        href="{% url 'remove-member' pk=obj.id code=member.profile.id %}"></a></div>
+                {% endfor %}
+                <a class="p-2 px-3" data-toggle="modal" data-target="#exampleModalCenter1"><i
+                        class="fa fa-plus text-success mr-2"></i>Add new member</a>
+            </div>
+            <label class="mt-3">Class privacy</label><br>
+            <select name="privacy" class="form-control">
+                {% if obj.privacy == 'OPEN' %}
+                <option value="OPEN" selected>Open for all</option>
+                {% else %}
+                <option value="OPEN">Open for all</option>
+                {% endif %}
+                {% if obj.privacy == 'INVITE ONLY' %}
+                <option value="INVITE ONLY" selected>Invite only</option>
+                {% else %}
+                <option value="INVITE ONLY">Invite only</option>
+                {% endif %}
+                {% if obj.privacy == 'CLOSED' %}
+                <option value="CLOSED" selected>Closed</option>
+                {% else %}
+                <option value="CLOSED">Closed</option>
+                {% endif %}
+            </select>
+            <label class="mt-3">Text privacy</label>
+            <select name="texting" class="form-control">
+                {% if obj.privacy == 'ALL' %}
+                <option value="ALL" selected>Everyone can send</option>
+                {% else %}
+                <option value="ALL">Everyone can send</option>
+                {% endif %}
+                {% if obj.privacy == 'ADMINs ONLY' %}
+                <option value="ADMINs ONLY" selected>Admins only</option>
+                {% else %}
+                <option value="ADMINs ONLY">Admins only</option>
+                {% endif %}
+            </select>
+            <button type="submit" class="btn btn-primary mt-3 d-block ml-auto mr-0">Update Settings</button>
+        </form>
+    </div>
+</div>
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Add new admin</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="font-small">By clicking on any user, You will make them as one of the admin of this class.
+                    Further, they will have access to this classroom settings. Also they can change/update the classroom
+                    settings.</p>
+                <div class="card">
+                    {% for member in obj.members.all %}
+                    {% if not member in obj.admin.all %}
+                    <a class="border-bottom p-2 px-3"
+                        href="{% url 'add-admin' pk=obj.id code=member.profile.id %}">{{member}}<i
+                            class="fa fa-user float-right mt-1"></i></a>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="exampleModalCenter1" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Add members to class</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <img id='barcode' class="d-none" src="" width="200" height="200">
+                <a id="invite" class="d-none" href="" style="color: blue;">
+                    <br>
+                    <script>
+                        var link = location.protocol + '//' + location.host + '/class/' + '{{obj.id}}/invite?by={{request.user.profile.id}}';
+                        document.write(link)
+                        document.getElementById('invite').href = link
+                    </script>
+                    <br>
+                </a>
+                <a>Scan the QR code to join this class. Or share with others to invite them to this class</a><br>
+                <button id="bar-but" onclick="myFunc()" class="btn btn-primary">Click here to show qr code...</button>
+                <script>
+                    function myFunc() {
+                        var link = location.protocol + '//' + location.host + '/class/' + '{{obj.id}}/invite?by={{request.user.profile.id}}';
+                        var url = 'https://api.qrserver.com/v1/create-qr-code/?data=' + link + '&amp;size=100x100';
+                        document.getElementById('barcode').src = url;
+                        document.getElementById('barcode').className = 'mb-2'
+                        document.getElementById('invite').className = ''
+                        document.getElementById('bar-but').className = 'd-none'
+                    }
+                </script>
+                <hr>
+                <form action="{% url 'add-member' pk=obj.id %}" method="POST">
+                    {% csrf_token %}
+                    <label>Enter the code of the user</label>
+                    <input type="text" name="code" autocomplete="off">
+                    <button class="btn btn-primary">Add</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+You have no authorisation to access this page
+{% endif %}
+{% endblock content %}
